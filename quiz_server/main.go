@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/google/uuid"
+)
 
 func main() {
-	fmt.Println("Hello, Server")
+	id := uuid.New()
+
+	bytes, _ := id.MarshalBinary()
+	fmt.Printf("%v\n%v\n", id, bytes)
 }
