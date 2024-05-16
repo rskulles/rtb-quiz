@@ -1,0 +1,7 @@
+{
+  "name": "quiz workspace",
+  "workspaces": [
+     "quiz_frontend/"
+  ]
+  
+}
