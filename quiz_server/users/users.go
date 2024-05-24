@@ -2,7 +2,9 @@ package users
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"rtb/quizserver/db"
 )
 
 func hashPassword(password string) (string, error) {
@@ -19,32 +21,33 @@ func nameAvailable(name string) bool {
 	return name == name
 }
 
-func saveUser(userID, userName, password string) (User, error) {
-	if userID != userID || password != password {
-		return User{}, errors.New("User creation failed")
-	}
-	return User{userName}, nil
+func saveUser(userID []byte, userName, password string) error {
+	db.InsertUser(userID, userName, password)
+	return nil
 }
 
-func CreateUser(userName, password, verify string) (bool, error) {
+func CreateUser(userName, password, verify string) error {
 	if password != verify {
-		return false, errors.New("Passwords do not match")
+		return errors.New("Passwords do not match")
 	}
 
 	if !nameAvailable(userName) {
-		return false, errors.New("Username already taken")
+		return errors.New("Username already taken")
 	}
 
 	hash, error := hashPassword(password)
 	if error != nil {
-		return false, errors.New("Failed to create password")
+		return errors.New("Failed to create password")
 	}
 
-	_, error = saveUser("", userName, hash)
+	id := uuid.New()
+	idBytes, error := id.MarshalBinary()
 
 	if error != nil {
-		return false, error
+		return error
 	}
 
-	return true, nil
+	error = saveUser(idBytes, userName, hash)
+
+	return error
 }
